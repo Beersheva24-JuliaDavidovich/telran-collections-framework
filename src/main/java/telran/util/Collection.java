@@ -9,10 +9,10 @@ public interface Collection<T> extends Iterable<T> {
     int size();
     boolean isEmpty();
     boolean contains(T pattern);
-    default Stream<T> stream(){
+    default Stream<T> stream() {
         return StreamSupport.stream(spliterator(), false);
     }
-    default Stream<T> parallelStream(){
+    default Stream<T> parallelStream() {
         return StreamSupport.stream(spliterator(), true);
     }
 }
