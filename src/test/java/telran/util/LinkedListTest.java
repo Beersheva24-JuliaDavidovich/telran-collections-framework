@@ -6,7 +6,7 @@ public class LinkedListTest extends ListTest{
     @BeforeEach
     @Override
     void setUp() {
-        collection = new ArrayList<>(3);
+        collection = new LinkedList<>();
         super.setUp();
     }
 }
