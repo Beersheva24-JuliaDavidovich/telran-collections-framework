@@ -62,11 +62,11 @@ public class ArrayList<T> implements List<T> {
 
    
     @Override
-    public T remove(Object array2) {
-        checkIndex(array2, false);
-        T res = (T)array[array2];
+    public T remove(int index) {
+        checkIndex(index, false);
+        T res = (T)array[index];
         size--;
-        System.arraycopy(array, array2 + 1, array, array2, size - array2);
+        System.arraycopy(array, index + 1, array, index, size - index);
         array[size] = null;
         return res;
     }
@@ -96,16 +96,18 @@ public class ArrayList<T> implements List<T> {
     }
     @Override
     public boolean removeIf(Predicate<T> predicate) {
-        //TODO
-        //algorithm complexity O[N]
-        //hint: two indices and going throught one array
-        int oldSize = size();
-        int i = 0;
-        for(i = 0; i < oldSize; i++) {
-            if(predicate.test((T)array[i]));
-            remove(array[i]);
-        }
-        return false;
+       int indexTo = 0;
+       Predicate<T> negPred = predicate.negate(); //not to apply "!" operator at each iteration
+       for(int currentIndex = 0; currentIndex < size; currentIndex++) {
+        T current = (T)array[currentIndex];
+            if(negPred.test(current)) {
+                array[indexTo++] = current;
+            }
+       }
+       Arrays.fill(array,indexTo, size, null);
+       boolean res = indexTo < size;
+       size = indexTo;
+       return res;
     }
 
     private class ArrayListIterator implements Iterator<T> {
