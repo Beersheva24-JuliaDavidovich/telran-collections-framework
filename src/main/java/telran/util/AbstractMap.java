@@ -1,4 +1,7 @@
 package telran.util;
+
+import java.util.Objects;
+
 @SuppressWarnings("unchecked")
 public abstract class AbstractMap<K, V> implements Map<K, V> {
     protected Set<Entry<K, V>> set;
@@ -6,39 +9,51 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
     @Override
     public V get(Object key) {
         
-        Entry<K, V> pattern = new Entry<>((K)key, null); 
-       Entry<K,V> entry = set.get(pattern);
-       V res = null; 
+        Entry<K, V> entry = getEntry(key);
+       V res = null;
        if (entry != null) {
         res = entry.getValue();
        }
        return res;
     }
+    private Entry<K, V> getEntry(Object key) {
+        Entry<K, V> pattern = getPattern(key);
+       Entry<K,V> entry = set.get(pattern);
+        return entry;
+    }
+    private Entry<K, V> getPattern(Object key) {
+        return new Entry<>((K)key, null);
+    }
 
     @Override
     public V put(K key, V value) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'put'");
+        Entry<K, V> entry = getEntry(key);
+        V res = null;
+        if (entry != null) {
+            res = entry.getValue();
+            entry.setValue(value);
+        } else {
+            set.add(new Entry<K, V>(key, value));
+        }
+        return res;
     }
 
     @Override
     public boolean containsKey(Object key) {
-        Entry<K, V> pattern = new Entry<>((K)key, null);
-        Entry<K, V> entry = set.get(pattern);
+        Entry<K, V> entry = getEntry(key);
         return entry != null;
     }
 
     @Override
     public boolean containsValue(Object value) {
-        boolean entry = set.contains((Entry<K, V>) value);
-        return entry;
+        return set.stream().anyMatch(e -> Objects.equals(e.getValue(),value));
     }
 
     @Override
     public Set<K> keySet() {
         Set<K> keySet = getEmptyKeySet();
-        //TODO
-        return null;
+        set.stream().map(Entry::getKey).forEach(keySet::add);
+        return keySet;
     }
 
     @Override
@@ -48,8 +63,9 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
 
     @Override
     public Collection<V> values() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'values'");
+        ArrayList<V> collection = new ArrayList<>(set.size());
+        set.stream().map(Entry::getValue).forEach(collection::add);
+        return collection;
     }
 
     @Override
@@ -60,6 +76,16 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
     @Override
     public boolean isEmpty() {
        return set.isEmpty();
+    }
+    @Override
+    public V remove (K key) {
+        Entry<K, V> entry = getEntry(key);
+        V res = null;
+        if (entry != null) {
+            set.remove(entry);
+            res = entry.getValue();
+        }
+        return res;
     }
 
 }
